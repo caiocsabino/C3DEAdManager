@@ -1,5 +1,5 @@
-#ifndef C3DE_SERVICE_ADS_MANAGER_H
-#define C3DE_SERVICE_ADS_MANAGER_H
+#ifndef C3DE_AD_MANAGER_H
+#define C3DE_AD_MANAGER_H
 
 #include "Singleton.h"
 #include "C3DEDelegate.h"
@@ -16,11 +16,11 @@ public:
     typedef C3DEDelegate<void, bool, bool> TypeVideoFinishedCallback;
 };
 
-class C3DEServiceAdsManager : public Singleton<C3DEServiceAdsManager>
+class C3DEAdManager : public Singleton<C3DEAdManager>
 {
 public:
-    C3DEServiceAdsManager();
-    ~C3DEServiceAdsManager();
+    C3DEAdManager();
+    ~C3DEAdManager();
 
     void SetUsingFakeAds(bool useFakeAds);
 

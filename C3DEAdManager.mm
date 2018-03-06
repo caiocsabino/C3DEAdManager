@@ -1,4 +1,4 @@
-#include "C3DEServiceAdsManager.h"
+#include "C3DEAdManager.h"
 #include <algorithm>
 
 #include "SponsorPay/C3DESponsorPayManager.h"
@@ -10,7 +10,7 @@
 
 #include "DebugMemory.h"
 
-C3DEServiceAdsManager::C3DEServiceAdsManager()
+C3DEAdManager::C3DEAdManager()
     : m_showingAd(false)
 	, m_offersInitializationRequested(false)
 	, m_fakeVideoOfferRequested(false)
@@ -22,12 +22,12 @@ C3DEServiceAdsManager::C3DEServiceAdsManager()
 
 }
 
-C3DEServiceAdsManager::~C3DEServiceAdsManager()
+C3DEAdManager::~C3DEAdManager()
 {
     
 }
 
-bool C3DEServiceAdsManager::InitializeAdOfferings(const std::string& appID, const std::string& appSecret, const std::string& userID)
+bool C3DEAdManager::InitializeAdOfferings(const std::string& appID, const std::string& appSecret, const std::string& userID)
 {
 	m_offersInitializationRequested = true;
 
@@ -75,7 +75,7 @@ bool C3DEServiceAdsManager::InitializeAdOfferings(const std::string& appID, cons
 
 }
 
-bool C3DEServiceAdsManager::HasVideoOffer() const
+bool C3DEAdManager::HasVideoOffer() const
 {
     if (m_usingFakeAds)
     {
@@ -94,7 +94,7 @@ bool C3DEServiceAdsManager::HasVideoOffer() const
 #endif	
 }
 
-bool C3DEServiceAdsManager::GetIsAdOfferInitialized() const
+bool C3DEAdManager::GetIsAdOfferInitialized() const
 {
     if (m_usingFakeAds)
     {
@@ -104,7 +104,7 @@ bool C3DEServiceAdsManager::GetIsAdOfferInitialized() const
     return m_initialized;
 }
 
-void C3DEServiceAdsManager::RequestVirtualCurrenciesEarned(const std::string& group, const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVirtualCurrenciesCallback>& callback)
+void C3DEAdManager::RequestVirtualCurrenciesEarned(const std::string& group, const std::shared_ptr<C3DEAdManagerCallback::TypeVirtualCurrenciesCallback>& callback)
 {
 #ifdef ADS_SPONSOR_PAY
 #if defined(PLATFORM_IPHONE)
@@ -117,7 +117,7 @@ void C3DEServiceAdsManager::RequestVirtualCurrenciesEarned(const std::string& gr
 #endif
 }
 
-void C3DEServiceAdsManager::CheckForVideoOffers(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVideoOfferCallback>& callback)
+void C3DEAdManager::CheckForVideoOffers(const std::shared_ptr<C3DEAdManagerCallback::TypeVideoOfferCallback>& callback)
 {
     if (m_usingFakeAds)
     {
@@ -144,7 +144,7 @@ void C3DEServiceAdsManager::CheckForVideoOffers(const std::shared_ptr<C3DEServic
 #endif
 }
 
-bool C3DEServiceAdsManager::PlayOfferedVideo(const std::string& group, const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVideoFinishedCallback>& callback)
+bool C3DEAdManager::PlayOfferedVideo(const std::string& group, const std::shared_ptr<C3DEAdManagerCallback::TypeVideoFinishedCallback>& callback)
 {
     if (m_usingFakeAds)
     {
@@ -169,7 +169,7 @@ bool C3DEServiceAdsManager::PlayOfferedVideo(const std::string& group, const std
 #endif
 }
 
-bool C3DEServiceAdsManager::IsShowingAd() const
+bool C3DEAdManager::IsShowingAd() const
 {
     return m_showingAd;
 }
