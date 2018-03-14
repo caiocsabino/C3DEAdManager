@@ -1,10 +1,19 @@
 #include "C3DEAdManager.h"
 #include <algorithm>
 
-#include "SponsorPay/C3DESponsorPayManager.h"
-
 #include "C3DEConsole.h"
 #include <memory>
+
+#ifdef ADS_SPONSOR_PAY
+#if defined(PLATFORM_IPHONE)
+#include "C3DEWrapper.h"
+#import "SponsorPaySDK.h"
+#import "SPVirtualCurrencyServerConnector.h"
+#import "SPVirtualCurrencyConnectionDelegate.h"
+#import <Foundation/Foundation.h>
+#import "C3DESponsorPaySingleton.h"
+#endif
+#endif
 
 #include "C3DEThread.h"
 
@@ -40,11 +49,11 @@ bool C3DEAdManager::InitializeAdOfferings(const std::string& appID, const std::s
 #if defined(PLATFORM_IPHONE)
     [NSHTTPCookieStorage sharedHTTPCookieStorage].cookieAcceptPolicy = NSHTTPCookieAcceptPolicyAlways;
     
-    m_applicationID = applicationID;
-    m_securityToken = securityToken;
+    m_applicationID = appID;
+    m_securityToken = appSecret;
     
-    NSString *applicationIDStr = [NSString stringWithUTF8String:applicationID.c_str()];
-    NSString *securityTokenStr = [NSString stringWithUTF8String:securityToken.c_str()];
+    NSString *applicationIDStr = [NSString stringWithUTF8String:appID.c_str()];
+    NSString *securityTokenStr = [NSString stringWithUTF8String:appSecret.c_str()];
     
     m_userID = userID;
 
@@ -104,7 +113,7 @@ bool C3DEAdManager::GetIsAdOfferInitialized() const
     return m_initialized;
 }
 
-void C3DEAdManager::RequestVirtualCurrenciesEarned(const std::string& group, const std::shared_ptr<C3DEAdManagerCallback::TypeVirtualCurrenciesCallback>& callback)
+void C3DEAdManager::RequestVirtualCurrenciesEarned(const std::string& group, const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVirtualCurrenciesCallback>& callback)
 {
 #ifdef ADS_SPONSOR_PAY
 #if defined(PLATFORM_IPHONE)
@@ -117,7 +126,7 @@ void C3DEAdManager::RequestVirtualCurrenciesEarned(const std::string& group, con
 #endif
 }
 
-void C3DEAdManager::CheckForVideoOffers(const std::shared_ptr<C3DEAdManagerCallback::TypeVideoOfferCallback>& callback)
+void C3DEAdManager::CheckForVideoOffers(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVideoOfferCallback>& callback)
 {
     if (m_usingFakeAds)
     {
@@ -144,7 +153,7 @@ void C3DEAdManager::CheckForVideoOffers(const std::shared_ptr<C3DEAdManagerCallb
 #endif
 }
 
-bool C3DEAdManager::PlayOfferedVideo(const std::string& group, const std::shared_ptr<C3DEAdManagerCallback::TypeVideoFinishedCallback>& callback)
+bool C3DEAdManager::PlayOfferedVideo(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVideoFinishedCallback>& callback)
 {
     if (m_usingFakeAds)
     {
@@ -160,11 +169,12 @@ bool C3DEAdManager::PlayOfferedVideo(const std::string& group, const std::shared
     
     C3DESponsorPaySingleton *sharedManager = [C3DESponsorPaySingleton sharedManager];
     [sharedManager playOfferedVideo:viewController callback:callback];
+    return true;
 #elif defined(PLATFORM_ANDROID)
-    
-#endif
-
-#else
+    return false;
+#endif //defined(PLATFORM_IPHONE)
+    return false;
+#else // ifdef ADS_SPONSOR_PAY
     return false;
 #endif
 }

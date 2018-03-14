@@ -30,15 +30,13 @@ public:
     
     bool HasVideoOffer() const;
     
-    bool IsAllowedToShowAvailableOffer(const std::string& group) const;
-    
     bool GetIsAdOfferInitialized() const;
     
     void RequestVirtualCurrenciesEarned(const std::string& name, const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVirtualCurrenciesCallback>& callback);
     
     void CheckForVideoOffers(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVideoOfferCallback>& callback);
     
-    bool PlayOfferedVideo(const std::string& name, const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVideoFinishedCallback>& callback);
+    bool PlayOfferedVideo(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVideoFinishedCallback>& callback);
     
     bool IsShowingAd() const;
     
