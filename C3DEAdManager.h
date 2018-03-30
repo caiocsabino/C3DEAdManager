@@ -3,6 +3,7 @@
 
 #include "Singleton.h"
 #include "C3DEDelegate.h"
+#include <memory>
 #include <string>
 #include <map>
 
