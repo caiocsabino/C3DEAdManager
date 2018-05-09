@@ -18,6 +18,9 @@ public:
     
     // success, played until the end
     typedef C3DEDelegate<void, bool, bool> TypeAdVideoFinishedCallback;
+    
+    // success, clicked = true, closed = false
+    typedef C3DEDelegate<void, bool, bool> TypeAdInterstitialCallback;
 
 };
 
@@ -49,7 +52,7 @@ public:
     // Interstitial
     void CheckForInterstitial(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeAdAvailabilityCallback>& callback);
     
-    bool ShowInterstitial(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeAdVideoFinishedCallback>& callback);
+    bool ShowInterstitial(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeAdInterstitialCallback>& callback);
     
     // Banners
     

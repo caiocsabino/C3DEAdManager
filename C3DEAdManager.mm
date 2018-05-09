@@ -237,8 +237,6 @@ void C3DEAdManager::CheckForInterstitial(const std::shared_ptr<C3DEServiceAdsMan
 #if defined(PLATFORM_IPHONE)
 #if defined(ADS_SPONSOR_PAY)
     
-    
-    
 #endif // if defined(ADS_SPONSOR_PAY)
     
 #elif defined(PLATFORM_ANDROID)
@@ -247,5 +245,27 @@ void C3DEAdManager::CheckForInterstitial(const std::shared_ptr<C3DEServiceAdsMan
 #endif
 #endif // if defined(PLATFORM_IPHONE)
     
+}
+
+bool C3DEAdManager::ShowInterstitial(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeAdInterstitialCallback>& callback)
+{
+    if (m_usingFakeAds)
+    {
+        m_fakeVideoOfferRequested = false;
+        (*callback)(true, true);
+        m_showingAd = false;
+        return true;
+    }
+    
+#if defined(PLATFORM_IPHONE)
+
+#elif defined(PLATFORM_ANDROID)
+#if defined(ADS_APPODEAL)
+    C3DESystemManager::GetInstance()->GetAndroidEngine()->ShowInterstitial(callback);
+#endif // defined(ADS_APPODEAL)
+    return false;
+#endif //defined(PLATFORM_IPHONE)
+    
+    return false;
 }
 
