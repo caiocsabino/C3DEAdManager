@@ -10,11 +10,15 @@
 class C3DEServiceAdsManagerCallback
 {
 public:
-    typedef C3DEDelegate<void, bool, double, const std::string&, const std::string&> TypeVirtualCurrenciesCallback;
+    // rewarded video
+    typedef C3DEDelegate<void, bool, double, const std::string&, const std::string&> TypeRewardedVideoVirtualCurrenciesCallback;
     
-    typedef C3DEDelegate<void, bool, bool> TypeVideoOfferCallback;
+    // success, offers available
+    typedef C3DEDelegate<void, bool, bool> TypeAdAvailabilityCallback;
     
-    typedef C3DEDelegate<void, bool, bool> TypeVideoFinishedCallback;
+    // success, played until the end
+    typedef C3DEDelegate<void, bool, bool> TypeAdVideoFinishedCallback;
+
 };
 
 class C3DEAdManager : public Singleton<C3DEAdManager>
@@ -27,19 +31,27 @@ public:
 
     inline bool GetUsingFakeAds() const { return m_usingFakeAds; }
     
-    bool InitializeAdOfferings(const std::string& appID, const std::string& appSecret, const std::string& userID = "");
-    
-    bool HasVideoOffer() const;
+    bool InitializeAdOfferings(const std::string& appID, const std::string& appSecret, const std::string& userID = "", int arguments = 0);
     
     bool GetIsAdOfferInitialized() const;
     
-    void RequestVirtualCurrenciesEarned(const std::string& name, const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVirtualCurrenciesCallback>& callback);
+    // Rewarded videos
+    bool HasRewardedVideo() const;
     
-    void CheckForVideoOffers(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVideoOfferCallback>& callback);
+    void RequestRewardedVideoVirtualCurrenciesEarned(const std::string& name, const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeRewardedVideoVirtualCurrenciesCallback>& callback);
     
-    bool PlayOfferedVideo(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVideoFinishedCallback>& callback);
+    void CheckForRewardedVideo(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeAdAvailabilityCallback>& callback);
+    
+    bool PlayRewardedVideo(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeAdVideoFinishedCallback>& callback);
     
     bool IsShowingAd() const;
+    
+    // Interstitial
+    void CheckForInterstitial(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeAdAvailabilityCallback>& callback);
+    
+    bool ShowInterstitial(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeAdVideoFinishedCallback>& callback);
+    
+    // Banners
     
 private:
     

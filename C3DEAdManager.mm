@@ -36,7 +36,7 @@ C3DEAdManager::~C3DEAdManager()
     
 }
 
-bool C3DEAdManager::InitializeAdOfferings(const std::string& appID, const std::string& appSecret, const std::string& userID)
+bool C3DEAdManager::InitializeAdOfferings(const std::string& appID, const std::string& appSecret, const std::string& userID, int arguments)
 {
 	m_offersInitializationRequested = true;
 
@@ -45,8 +45,9 @@ bool C3DEAdManager::InitializeAdOfferings(const std::string& appID, const std::s
         return true;
     }
 
-#ifdef ADS_SPONSOR_PAY
 #if defined(PLATFORM_IPHONE)
+#if defined(ADS_SPONSOR_PAY)
+
     [NSHTTPCookieStorage sharedHTTPCookieStorage].cookieAcceptPolicy = NSHTTPCookieAcceptPolicyAlways;
     
     m_applicationID = appID;
@@ -70,37 +71,59 @@ bool C3DEAdManager::InitializeAdOfferings(const std::string& appID, const std::s
         [SponsorPaySDK setShowPayoffNotificationOnVirtualCoinsReceived:false];
     }
     
-    
-#elif defined(PLATFORM_ANDROID)
-    C3DESystemManager::GetInstance()->GetAndroidEngine()->InitializeSponsorPay(applicationID, securityToken);
-#endif
-    
     m_initialized = true;
-
+    
     return true;
-#else 
+#else // ifdef ADS_SPONSOR_PAY
     return false;
 #endif
+    
+#elif defined(PLATFORM_ANDROID)
+#if defined(ADS_SPONSOR_PAY)
+    C3DESystemManager::GetInstance()->GetAndroidEngine()->InitializeSponsorPay(applicationID, securityToken);
+    
+    m_initialized = true;
+    
+    return true;
+#elif defined(ADS_APPODEAL)
+    
+    C3DESystemManager::GetInstance()->GetAndroidEngine()->InitializeAppodeal(securityToken, arguments);
+    
+    m_initialized = true;
+    
+    return true;
+    
+#endif // ifdef ADS_SPONSOR_PAY
+    
+#endif // elif defined(PLATFORM_ANDROID)
+    
+return false;
 
 }
 
-bool C3DEAdManager::HasVideoOffer() const
+bool C3DEAdManager::HasRewardedVideo() const
 {
     if (m_usingFakeAds)
     {
         return m_fakeVideoOfferRequested;
     }
-	
-#ifdef ADS_SPONSOR_PAY
+    
+    
 #if defined(PLATFORM_IPHONE)
+#if defined(ADS_SPONSOR_PAY)
     C3DESponsorPaySingleton *sharedManager = [C3DESponsorPaySingleton sharedManager];
     return [sharedManager hasVideoOffer];
-#elif defined(PLATFORM_ANDROID)
+#else // #ifdef ADS_SPONSOR_PAY
     return false;
 #endif
+#elif defined(PLATFORM_ANDROID)
+#if defined(ADS_APPODEAL)
+    return true;
 #else
     return false;
-#endif	
+#endif
+#endif // if defined(PLATFORM_IPHONE)
+
 }
 
 bool C3DEAdManager::GetIsAdOfferInitialized() const
@@ -113,7 +136,7 @@ bool C3DEAdManager::GetIsAdOfferInitialized() const
     return m_initialized;
 }
 
-void C3DEAdManager::RequestVirtualCurrenciesEarned(const std::string& group, const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVirtualCurrenciesCallback>& callback)
+void C3DEAdManager::RequestRewardedVideoVirtualCurrenciesEarned(const std::string& group, const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeRewardedVideoVirtualCurrenciesCallback>& callback)
 {
 #ifdef ADS_SPONSOR_PAY
 #if defined(PLATFORM_IPHONE)
@@ -126,7 +149,7 @@ void C3DEAdManager::RequestVirtualCurrenciesEarned(const std::string& group, con
 #endif
 }
 
-void C3DEAdManager::CheckForVideoOffers(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVideoOfferCallback>& callback)
+void C3DEAdManager::CheckForRewardedVideo(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeAdAvailabilityCallback>& callback)
 {
     if (m_usingFakeAds)
     {
@@ -141,19 +164,24 @@ void C3DEAdManager::CheckForVideoOffers(const std::shared_ptr<C3DEServiceAdsMana
         });
         return;
     }
-	
-#ifdef ADS_SPONSOR_PAY
+
 #if defined(PLATFORM_IPHONE)
+#if defined(ADS_SPONSOR_PAY)
+
     C3DESponsorPaySingleton *sharedManager = [C3DESponsorPaySingleton sharedManager];
     [sharedManager requestVideoOffers:callback];
+
+#endif // if defined(ADS_SPONSOR_PAY)
     
 #elif defined(PLATFORM_ANDROID)
+#if defined(ADS_APPODEAL)
     C3DESystemManager::GetInstance()->GetAndroidEngine()->CheckForVideoOffers(callback);
 #endif
-#endif
+#endif // if defined(PLATFORM_IPHONE)
+	
 }
 
-bool C3DEAdManager::PlayOfferedVideo(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeVideoFinishedCallback>& callback)
+bool C3DEAdManager::PlayRewardedVideo(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeAdVideoFinishedCallback>& callback)
 {
     if (m_usingFakeAds)
     {
@@ -162,24 +190,62 @@ bool C3DEAdManager::PlayOfferedVideo(const std::shared_ptr<C3DEServiceAdsManager
         m_showingAd = false;
         return true;
     }
-    
-#ifdef ADS_SPONSOR_PAY
+
 #if defined(PLATFORM_IPHONE)
+#if defined(ADS_SPONSOR_PAY)
+
     UIViewController * viewController = C3DEWrapper::GetInstance()->GetViewController();
     
     C3DESponsorPaySingleton *sharedManager = [C3DESponsorPaySingleton sharedManager];
     [sharedManager playOfferedVideo:viewController callback:callback];
     return true;
+#else //if defined(ADS_SPONSOR_PAY)
+    return false
+#endif
 #elif defined(PLATFORM_ANDROID)
+#if defined(ADS_APPODEAL)
+    return true;
+#endif // defined(ADS_APPODEAL)
     return false;
 #endif //defined(PLATFORM_IPHONE)
+    
     return false;
-#else // ifdef ADS_SPONSOR_PAY
-    return false;
-#endif
 }
 
 bool C3DEAdManager::IsShowingAd() const
 {
     return m_showingAd;
 }
+
+// Interstitial
+void C3DEAdManager::CheckForInterstitial(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeAdAvailabilityCallback>& callback)
+{
+    if (m_usingFakeAds)
+    {
+        C3DEThread thread([&, callback]()
+                          {
+                              int milliseconds = 5000.0f;
+                              std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+                              
+                              m_fakeVideoOfferRequested = true;
+                              
+                              (*callback)(true, true);
+                          });
+        return;
+    }
+    
+#if defined(PLATFORM_IPHONE)
+#if defined(ADS_SPONSOR_PAY)
+    
+    
+    
+#endif // if defined(ADS_SPONSOR_PAY)
+    
+#elif defined(PLATFORM_ANDROID)
+#if defined(ADS_APPODEAL)
+    C3DESystemManager::GetInstance()->GetAndroidEngine()->CheckForInterstitial(callback);
+#endif
+#endif // if defined(PLATFORM_IPHONE)
+    
+}
+
