@@ -4,8 +4,9 @@
 #include "C3DEConsole.h"
 #include <memory>
 
-#ifdef ADS_SPONSOR_PAY
 #if defined(PLATFORM_IPHONE)
+#ifdef ADS_SPONSOR_PAY
+
 #include "C3DEWrapper.h"
 #import "SponsorPaySDK.h"
 #import "SPVirtualCurrencyServerConnector.h"
@@ -13,6 +14,8 @@
 #import <Foundation/Foundation.h>
 #import "C3DESponsorPaySingleton.h"
 #endif
+#elif defined(PLATFORM_ANDROID)
+#include "C3DESystemManager.h"
 #endif
 
 #include "C3DEThread.h"
@@ -87,7 +90,7 @@ bool C3DEAdManager::InitializeAdOfferings(const std::string& appID, const std::s
     return true;
 #elif defined(ADS_APPODEAL)
     
-    C3DESystemManager::GetInstance()->GetAndroidEngine()->InitializeAppodeal(securityToken, arguments);
+    C3DESystemManager::GetInstance()->GetAndroidEngine()->InitializeAppodeal(appSecret, arguments);
     
     m_initialized = true;
     
@@ -241,7 +244,7 @@ void C3DEAdManager::CheckForInterstitial(const std::shared_ptr<C3DEServiceAdsMan
     
 #elif defined(PLATFORM_ANDROID)
 #if defined(ADS_APPODEAL)
-    C3DESystemManager::GetInstance()->GetAndroidEngine()->CheckForInterstitial(callback);
+    C3DESystemManager::GetInstance()->GetAndroidEngine()->CheckForInterstitialOffers(callback);
 #endif
 #endif // if defined(PLATFORM_IPHONE)
     
@@ -262,6 +265,25 @@ bool C3DEAdManager::ShowInterstitial(const std::shared_ptr<C3DEServiceAdsManager
 #elif defined(PLATFORM_ANDROID)
 #if defined(ADS_APPODEAL)
     C3DESystemManager::GetInstance()->GetAndroidEngine()->ShowInterstitial(callback);
+#endif // defined(ADS_APPODEAL)
+    return false;
+#endif //defined(PLATFORM_IPHONE)
+    
+    return false;
+}
+
+bool C3DEAdManager::HasInterstitial() const
+{
+    if (m_usingFakeAds)
+    {
+        return true;
+    }
+    
+#if defined(PLATFORM_IPHONE)
+    
+#elif defined(PLATFORM_ANDROID)
+#if defined(ADS_APPODEAL)
+    C3DESystemManager::GetInstance()->GetAndroidEngine()->HasInterstitial();
 #endif // defined(ADS_APPODEAL)
     return false;
 #endif //defined(PLATFORM_IPHONE)

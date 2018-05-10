@@ -54,6 +54,8 @@ public:
     
     bool ShowInterstitial(const std::shared_ptr<C3DEServiceAdsManagerCallback::TypeAdInterstitialCallback>& callback);
     
+    bool HasInterstitial() const;
+    
     // Banners
     
 private:
