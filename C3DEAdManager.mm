@@ -206,6 +206,7 @@ bool C3DEAdManager::PlayRewardedVideo(const std::shared_ptr<C3DEServiceAdsManage
 #endif
 #elif defined(PLATFORM_ANDROID)
 #if defined(ADS_APPODEAL)
+    C3DESystemManager::GetInstance()->GetAndroidEngine()->ShowRewardedVideo(callback);
     return true;
 #endif // defined(ADS_APPODEAL)
     return false;
