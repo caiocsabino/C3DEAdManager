@@ -16,8 +16,8 @@ public:
     // success, offers available
     typedef C3DEDelegate<void, bool, bool> TypeAdAvailabilityCallback;
     
-    // success, played until the end
-    typedef C3DEDelegate<void, bool, bool> TypeAdVideoFinishedCallback;
+    // success, played until the end, currency amount, currency name
+    typedef C3DEDelegate<void, bool, bool, double, const std::string&> TypeAdVideoFinishedCallback;
     
     // success, clicked = true, closed = false
     typedef C3DEDelegate<void, bool, bool> TypeAdInterstitialCallback;

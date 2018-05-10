@@ -111,7 +111,6 @@ bool C3DEAdManager::HasRewardedVideo() const
         return m_fakeVideoOfferRequested;
     }
     
-    
 #if defined(PLATFORM_IPHONE)
 #if defined(ADS_SPONSOR_PAY)
     C3DESponsorPaySingleton *sharedManager = [C3DESponsorPaySingleton sharedManager];
@@ -121,7 +120,7 @@ bool C3DEAdManager::HasRewardedVideo() const
 #endif
 #elif defined(PLATFORM_ANDROID)
 #if defined(ADS_APPODEAL)
-    return true;
+    return C3DESystemManager::GetInstance()->GetAndroidEngine()->HasRewardedVideo();
 #else
     return false;
 #endif
@@ -178,7 +177,7 @@ void C3DEAdManager::CheckForRewardedVideo(const std::shared_ptr<C3DEServiceAdsMa
     
 #elif defined(PLATFORM_ANDROID)
 #if defined(ADS_APPODEAL)
-    C3DESystemManager::GetInstance()->GetAndroidEngine()->CheckForVideoOffers(callback);
+    C3DESystemManager::GetInstance()->GetAndroidEngine()->CheckForRewardedVideoOffers(callback);
 #endif
 #endif // if defined(PLATFORM_IPHONE)
 	
@@ -189,7 +188,7 @@ bool C3DEAdManager::PlayRewardedVideo(const std::shared_ptr<C3DEServiceAdsManage
     if (m_usingFakeAds)
     {
         m_fakeVideoOfferRequested = false;
-        (*callback)(true, true);
+        (*callback)(true, true, 0, "");
         m_showingAd = false;
         return true;
     }

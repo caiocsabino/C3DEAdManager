@@ -66,7 +66,7 @@
     {
         bool completed = newStatus == CLOSE_FINISHED;
         
-        (*m_lastVideoFinishedCallback)(true, completed);
+        (*m_lastVideoFinishedCallback)(true, completed, 0, "");
     }
     
     if (m_lastVideoOfferCallback && newStatus == ERROR)
