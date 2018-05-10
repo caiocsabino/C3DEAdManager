@@ -283,7 +283,7 @@ bool C3DEAdManager::HasInterstitial() const
     
 #elif defined(PLATFORM_ANDROID)
 #if defined(ADS_APPODEAL)
-    C3DESystemManager::GetInstance()->GetAndroidEngine()->HasInterstitial();
+    return C3DESystemManager::GetInstance()->GetAndroidEngine()->HasInterstitial();
 #endif // defined(ADS_APPODEAL)
     return false;
 #endif //defined(PLATFORM_IPHONE)
